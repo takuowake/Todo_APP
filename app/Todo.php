@@ -15,4 +15,7 @@ class Todo extends Model
     public function goal() {
         return $this->belongsTo('App\Goal');
     }
+    public function tags() {
+        return $this->belongsToMany('App\Tag');
+    }
 }
