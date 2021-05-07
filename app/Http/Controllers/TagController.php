@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Todo;
+use App\Goal;
 use App\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class TagController extends Controller
+class TodoController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request, Goal $goal)
     {
-        $user = Auth::user();
-        $tags = $user->tags;
-        return response()->json($tags);
+        $todos = $goal->todos()->with('tags')->orderBy('done', 'asc')->orderBy('position', 'asc')->get();
+        return response()->json($todos);
     }
 
     /**
@@ -26,51 +27,85 @@ class TagController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Goal $goal)
     {
-        $tag = new Tag();
-        $tag->title = request('title');
-        $tag->user_id = Auth::id();
-        $tag->save();
-        
-        $user = Auth::user();
-        
-        $tags = $user->tags;
-        return response()->json($tags);
+        $todo = new Todo();
+        $todo->content = request('content');
+        $todo->user_id = Auth::id();
+        $todo->goal_id = $goal->id;
+        $todo->position = request('position');
+        $todo->done = false;
+        $todo->save();
+        $todos = $goal->todos()->with('tags')->orderBy('done', 'asc')->orderBy('position', 'asc')->get();
+        return response()->json($todos);
     }
-
+    
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Tag  $tag
+     * @param  \App\Todo  $todo
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Tag $tag)
+    public function update(Request $request, Goal $goal, Todo $todo)
     {
-        $tag->title = request('title');
-        $tag->user_id = Auth::id();
-        $tag->save();
+        $todo->content = request('content');
+        $todo->user_id = Auth::id();
+        $todo->goal_id = $goal->id;
+        $todo->position = request('position');
+        $todo->done = (bool) request('done');
+        $todo->save();
 
-        $user = Auth::user();
-
-        $tags = $user->tags;
-        return response()->json($tags);
+        $todos = $goal->todos()->with('tags')->orderBy('done', 'asc')->orderBy('position', 'asc')->get();
+        return response()->json($todos);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Tag  $tag
+     * @param  \App\Todo  $todo
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Tag $tag)
+    public function destroy(Request $request, Goal $goal, Todo $todo)
     {
-        $tag->delete();
+        $todo->delete();
+        $todos = $goal->todos()->with('tags')->orderBy('done', 'asc')->orderBy('position', 'asc')->get();
+        return response()->json($todos);
+    }
 
-        $user = Auth::user();
+    public function sort(Request $request, Goal $goal, Todo $todo)
+    {
+        $exchangeTodo = Todo::where('position', request('sortId'))->first();
+        $lastTodo = Todo::where('position', request('sortId'))->latest('position')->first();
 
-        $tags = $user->tags;
-        return response()->json($tags);
+        if (request('sortId') == 0) {
+            $todo->moveBefore($exchangeTodo);
+        } else if (request('sortId') - 1 == $lastTodo->position) {
+            $todo->moveAfter($exchangeTodo);
+        } else {
+            $todo->moveAfter($exchangeTodo);
+        }
+
+        $todos = $goal->todos()->with('tags')->orderBy('done', 'asc')->orderBy('position', 'asc')->get();
+
+        return response()->json($todos);
+    }
+
+    public function addTag(Request $request, Goal $goal, Todo $todo, Tag $tag)
+    {
+        $todo->tags()->attach($tag->id);
+
+        $todos = $goal->todos()->with('tags')->orderBy('done', 'asc')->orderBy('position', 'asc')->get();
+
+        return response()->json($todos);
+    }
+    
+    public function removeTag(Request $request, Goal $goal, Todo $todo, Tag $tag)
+    {
+        $todo->tags()->detach($tag->id);
+
+        $todos = $goal->todos()->with('tags')->orderBy('done', 'asc')->orderBy('position', 'asc')->get();
+
+        return response()->json($todos);
     }
 }
