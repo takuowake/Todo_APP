@@ -1,5 +1,5 @@
 # TODOアプリケーション
-TODOリストを作成し、追加・編集・削除ができます。会員登録・ログイン機能も追加いたしました。
+TODOリストを作成し、追加・編集・削除ができます。会員登録・ログイン機能も追加いたしました。<br>
 テスト用アカウント<br>
 Mail Address: Test@test<br>
 Password: test1111<br>
@@ -9,15 +9,6 @@ Password: test1111<br>
 ## Dependency
 PHP7.2/Javascript/HTML/CSS<br>
 Laravel5.8/Vue.js2.6/Bootstrap4.6<br>
-
-<p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>
-
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
 
 ## About Laravel
 
